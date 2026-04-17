@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bero Admin | Login</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/static/style.css">
+    <script src="/static/htmx.min.js"></script>
+</head>
+
+<body class="">
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-header">
+                <h1 class="login-title text-gradient">Bero Admin</h1>
+                <p class="login-subtitle">Faça login para continuar</p>
+            </div>
+
+            <form class="login-form" method="post" action="/admin/login" hx-post="/admin/login" hx-swap="none" hx-indicator="#login-spinner">
+
+                {% if let Some(msg) = success_message %}
+                <div class="alert alert--success">
+                    {{ msg }}
+                </div>
+                {% endif %}
+
+                <!-- Container para erro via HTMX -->
+                <div id="login-error"></div>
+
+                <!-- Spinner de loading -->
+                <div id="login-spinner" class="htmx-indicator login-spinner"></div>
+
+                <div class="form-field">
+                    <label for="username">Usuário ou E-mail</label>
+                    <input type="text" id="username" name="username" class="form-input"
+                        placeholder="seu@email.com ou username" required>
+                </div>
+
+                <div class="form-field">
+                    <label for="password">Senha</label>
+                    <input type="password" id="password" name="password" class="form-input" placeholder="••••••••"
+                        required>
+                </div>
+
+                <div class="form-field">
+                    <label class="checkbox-label">
+                        <input type="checkbox" name="remember" class="form-checkbox">
+                        Lembrar de mim
+                    </label>
+                </div>
+
+                <button type="submit" class="btn btn--primary btn--full">
+                    Entrar →
+                </button>
+            </form>
+
+            <div class="login-footer">
+                <a href="/auth/forgot-password" class="login-link">Esqueceu sua senha?</a>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>

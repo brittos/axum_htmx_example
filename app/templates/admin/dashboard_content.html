@@ -1,0 +1,72 @@
+{% import "shared/icons.html" as icons %}
+<div class="stats-grid">
+    <!-- Active Users -->
+    <div class="card stat-card">
+        <div class="stat-header">
+            <div>
+                <p class="stat-label">Usuários Ativos</p>
+                <h3 class="stat-value">{{ active_users }}</h3>
+            </div>
+        </div>
+        <div class="stat-footer">
+            <span class="stat-icon stat-icon--success">{% call icons::trending_up() %}{% endcall %}</span>
+            <span class="text-success">+12%</span>
+            <span class="text-secondary">vs. mês anterior</span>
+        </div>
+    </div>
+
+    <!-- Total Posts -->
+    <div class="card stat-card">
+        <div class="stat-header">
+            <div>
+                <p class="stat-label">Total de Posts</p>
+                <h3 class="stat-value">{{ total_posts }}</h3>
+            </div>
+        </div>
+        <div class="stat-footer">
+            <span class="stat-icon stat-icon--primary">{% call icons::trending_up() %}{% endcall %}</span>
+            <span class="text-primary">+5%</span>
+            <span class="text-secondary">vs. mês anterior</span>
+        </div>
+    </div>
+
+    <!-- Server Load -->
+    <div class="card stat-card">
+        <div class="stat-header">
+            <div>
+                <p class="stat-label">Carga do Servidor</p>
+                <h3 class="stat-value">{{ server_load }}%</h3>
+            </div>
+        </div>
+        <div class="stat-footer">
+            <span class="stat-icon stat-icon--warning">{% call icons::trending_down() %}{% endcall %}</span>
+            <span class="text-warning">-2%</span>
+            <span class="text-secondary">vs. semana passada</span>
+        </div>
+    </div>
+
+    <!-- System Health -->
+    <div class="card stat-card">
+        <div class="stat-header">
+            <div>
+                <p class="stat-label">Saúde do Sistema</p>
+                <h3 class="stat-value">{{ system_health }}</h3>
+            </div>
+        </div>
+        <div class="stat-footer">
+            <span class="stat-icon stat-icon--danger">{% call icons::trending_up() %}{% endcall %}</span>
+            <span class="text-danger">-1%</span>
+            <span class="text-secondary">vs. ontem</span>
+        </div>
+    </div>
+</div>
+
+<div class="card mt-6">
+    <h3 class="cell-bold mb-4">Atividade Recente</h3>
+    <div class="activity-placeholder">
+        <div class="text-center text-secondary">
+            {% call icons::bar_chart_2("icon-4xl opacity-20 mb-4") %}{% endcall %}
+            <p class="mt-2">Gráfico de atividade carregará aqui...</p>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,28 @@
+{% extends "base.html" %}
+{% import "shared/icons.html" as icons %}
+
+{% block title %}400 - Requisição Inválida{% endblock %}
+
+{% block content %}
+<div class="flex-center h-full">
+    <div class="card error-card">
+        <div class="flex-center mb-6">
+            <i data-lucide="alert-triangle" class="text-warning icon-4xl"></i>
+        </div>
+        <h1 class="error-code">400</h1>
+        <h2 class="text-secondary mb-6">Requisição Inválida</h2>
+        <p class="text-secondary mb-4">
+            A requisição enviada não pôde ser processada pelo servidor.
+        </p>
+        <p class="text-secondary text-sm mb-6">
+            {{ message }}
+        </p>
+        <div class="mt-6">
+            <a href="/" class="btn btn--primary no-underline">
+                <i data-lucide="home" class="icon-sm"></i>
+                Ir para Home
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

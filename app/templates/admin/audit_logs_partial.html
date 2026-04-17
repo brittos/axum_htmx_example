@@ -1,0 +1,132 @@
+{% import "shared/icons.html" as icons %}
+
+<div class="table-container" id="audit-logs-content" hx-get="/admin/audit-logs/partial" hx-trigger="every 30s"
+    hx-vals='{"page": "{{ current_page }}"}'
+    hx-include="[name='action'], [name='entity_type'], [name='username'], [name='date_from'], [name='date_to']"
+    hx-select=".table-container" hx-swap="outerHTML">
+    <div class="rbac-header">
+        <div>
+            <h2 class="cell-bold">Audit Logs</h2>
+            <p class="section-header__subtitle">Histórico de ações e eventos do sistema.</p>
+        </div>
+        <div class="section-header__actions">
+            <a href="/admin/audit-logs/export-csv{% if filter_action.is_some() || filter_entity_type.is_some() || filter_username.is_some() || filter_date_from.is_some() || filter_date_to.is_some() %}?{% endif %}{% if let Some(action) = filter_action %}action={{ action }}&{% endif %}{% if let Some(entity_type) = filter_entity_type %}entity_type={{ entity_type }}&{% endif %}{% if let Some(username) = filter_username %}username={{ username }}&{% endif %}{% if let Some(date_from) = filter_date_from %}date_from={{ date_from }}&{% endif %}{% if let Some(date_to) = filter_date_to %}date_to={{ date_to }}{% endif %}"
+                class="btn btn--ghost" title="Download CSV" download>
+                {% call icons::download() %}{% endcall %}
+            </a>
+        </div>
+    </div>
+
+    <!-- Filtros -->
+    <div class="audit-filters">
+        <select name="action" class="form-select form-select--sm" hx-get="/admin/audit-logs/partial"
+            hx-target="#audit-logs-content" hx-swap="outerHTML" hx-trigger="change"
+            hx-include="[name='entity_type'], [name='username'], [name='date_from'], [name='date_to']">
+            <option value="" {% if filter_action.is_none() %}selected{% endif %}>Todas as ações</option>
+            <option value="create" {% if filter_action.as_deref()==Some("create") %}selected{% endif %}>create</option>
+            <option value="update" {% if filter_action.as_deref()==Some("update") %}selected{% endif %}>update</option>
+            <option value="delete" {% if filter_action.as_deref()==Some("delete") %}selected{% endif %}>delete</option>
+            <option value="login" {% if filter_action.as_deref()==Some("login") %}selected{% endif %}>login</option>
+            <option value="logout" {% if filter_action.as_deref()==Some("logout") %}selected{% endif %}>logout</option>
+        </select>
+        <select name="entity_type" class="form-select form-select--sm" hx-get="/admin/audit-logs/partial"
+            hx-target="#audit-logs-content" hx-swap="outerHTML" hx-trigger="change"
+            hx-include="[name='action'], [name='username'], [name='date_from'], [name='date_to']">
+            <option value="" {% if filter_entity_type.is_none() %}selected{% endif %}>Todas as entidades</option>
+            <option value="user" {% if filter_entity_type.as_deref()==Some("user") %}selected{% endif %}>user</option>
+            <option value="post" {% if filter_entity_type.as_deref()==Some("post") %}selected{% endif %}>post</option>
+        </select>
+        <input type="text" name="username" class="form-input form-input--sm audit-filters__username"
+            placeholder="🔍 Buscar usuário" value="{% if let Some(u) = filter_username %}{{ u }}{% endif %}"
+            hx-get="/admin/audit-logs/partial" hx-target="#audit-logs-content" hx-swap="outerHTML"
+            hx-trigger="keyup delay:1s changed, change"
+            hx-include="[name='action'], [name='entity_type'], [name='date_from'], [name='date_to']">
+        <input type="date" name="date_from" class="form-input form-input--sm audit-filters__date"
+            value="{% if let Some(d) = filter_date_from %}{{ d }}{% endif %}" hx-get="/admin/audit-logs/partial"
+            hx-target="#audit-logs-content" hx-swap="outerHTML" hx-trigger="change"
+            hx-include="[name='action'], [name='entity_type'], [name='username'], [name='date_to']"
+            title="Data inicial">
+        <input type="date" name="date_to" class="form-input form-input--sm audit-filters__date"
+            value="{% if let Some(d) = filter_date_to %}{{ d }}{% endif %}" hx-get="/admin/audit-logs/partial"
+            hx-target="#audit-logs-content" hx-swap="outerHTML" hx-trigger="change"
+            hx-include="[name='action'], [name='entity_type'], [name='username'], [name='date_from']"
+            title="Data final">
+    </div>
+
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Ação</th>
+                    <th>Entidade</th>
+                    <th>Usuário</th>
+                    <th>IP</th>
+                    <th>Detalhes</th>
+                    <th>Data/Hora</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for log in logs %}
+                <tr>
+                    <td><span class="badge {{ log.action_badge_class }}">{{ log.action }}</span></td>
+                    <td>
+                        <span class="badge badge--scheduled">{{ log.entity_type }}</span>
+                    </td>
+                    <td>
+                        {% if let Some(username) = log.username %}
+                        <span class="cell-bold">{{ username }}</span>
+                        {% elif let Some(user_id) = log.user_id %}
+                        <small class="text-muted">{{ user_id }}</small>
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if let Some(ip) = log.ip_address %}
+                        {{ ip }}
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td>
+                        {% if let Some(details) = log.details %}
+                        <details class="audit-details">
+                            <summary>Ver detalhes</summary>
+                            <pre class="audit-details__content">{{ details }}</pre>
+                        </details>
+                        {% else %}
+                        <span class="text-muted">-</span>
+                        {% endif %}
+                    </td>
+                    <td class="cell-nowrap">
+                        <small class="text-muted">{{ log.created_at }}</small>
+                        <br>
+                        <small class="text-muted">{{ log.created_at_relative }}</small>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="6" class="text-center text-muted">Nenhum log de auditoria encontrado.</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if total_pages > 1 %}
+    <div class="pagination">
+        <button class="btn btn--ghost btn--sm" hx-get="/admin/audit-logs/partial"
+            hx-vals='{"page": "{{ current_page - 1 }}"{% if let Some(action) = filter_action %}, "action": "{{ action }}"{% endif %}{% if let Some(entity_type) = filter_entity_type %}, "entity_type": "{{ entity_type }}"{% endif %}{% if let Some(username) = filter_username %}, "username": "{{ username }}"{% endif %}{% if let Some(date_from) = filter_date_from %}, "date_from": "{{ date_from }}"{% endif %}{% if let Some(date_to) = filter_date_to %}, "date_to": "{{ date_to }}"{% endif %}}'
+            hx-target="#audit-logs-content" hx-swap="outerHTML" {% if current_page <=1 %}disabled{% endif %}>
+            ← Anterior
+        </button>
+        <span class="pagination__info">Página {{ current_page }} de {{ total_pages }}</span>
+        <button class="btn btn--ghost btn--sm" hx-get="/admin/audit-logs/partial"
+            hx-vals='{"page": "{{ current_page + 1 }}"{% if let Some(action) = filter_action %}, "action": "{{ action }}"{% endif %}{% if let Some(entity_type) = filter_entity_type %}, "entity_type": "{{ entity_type }}"{% endif %}{% if let Some(username) = filter_username %}, "username": "{{ username }}"{% endif %}{% if let Some(date_from) = filter_date_from %}, "date_from": "{{ date_from }}"{% endif %}{% if let Some(date_to) = filter_date_to %}, "date_to": "{{ date_to }}"{% endif %}}'
+            hx-target="#audit-logs-content" hx-swap="outerHTML" {% if current_page>= total_pages %}disabled{% endif %}>
+            Próxima →
+        </button>
+    </div>
+    {% endif %}
+</div>

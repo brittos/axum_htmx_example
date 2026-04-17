@@ -1,0 +1,27 @@
+{% extends "base.html" %}
+{% import "shared/icons.html" as icons %}
+
+{% block title %}429 - Muitas Requisições{% endblock %}
+
+{% block content %}
+<div class="flex-center h-full">
+    <div class="card error-card">
+        <div class="flex-center mb-6">
+            {{ icons::alarm_clock(class="icon-4xl text-warning rate-limit-icon") }}
+        </div>
+        <h1 class="error-code">429</h1>
+        <h2 class="text-secondary mb-6">Muitas Requisições</h2>
+        <p class="text-secondary mb-4">
+            Você atingiu o limite de requisições.
+        </p>
+        <p class="text-secondary text-sm mb-6">
+            Por favor, aguarde <strong>{{ wait_seconds }}</strong> segundos antes de tentar novamente.
+        </p>
+        <div class="mt-6">
+            <a href="/admin" class="btn btn--primary no-underline">
+                Voltar ao Dashboard
+            </a>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,94 @@
+{% import "shared/icons.html" as icons %}
+<div class="rbac-grid animate-fade">
+    <!-- Role Selector -->
+    <div class="card role-selector-card">
+        <div class="flex-between mb-4">
+            <p class="stat-label">Pilar 2: Roles</p>
+            <button class="btn btn--ghost btn--pagination cursor-not-allowed opacity-50 btn--compact"
+                title="Feature not available in static mode">
+                {% call icons::plus("icon-xs") %}{% endcall %}
+            </button>
+        </div>
+
+        <div class="flex-column gap-2 mt-2">
+            {% for r in roles %}
+            <button class="role-btn {% if r.name.as_str() == active_role.as_str() %}role-btn--active{% endif %}"
+                hx-get="/admin/rbac/partial?role={{ r.name }}" hx-target="#main-content" hx-swap="innerHTML" {% if
+                r.name.as_str()==active_role.as_str()
+                %}style="background-color: {{ r.bg_color }}; border-color: {{ r.bg_color }};" {% endif %}>
+                <span>{{ r.name }}</span>
+                {% if r.name.as_str() == active_role.as_str() %}
+                {% call icons::check("icon-sm") %}{% endcall %}
+                {% endif %}
+            </button>
+            {% endfor %}
+        </div>
+
+        <div class="role-info-card">
+            <div class="flex-center gap-2 mb-2 justify-start text-accent">
+                {% call icons::shield_alert("icon-sm") %}{% endcall %}
+                <span class="font-bold text-sm">Info do Perfil</span>
+            </div>
+            <p class="text-secondary text-sm">
+                Alterações na matriz de <strong>{{ active_role }}</strong> afetarão todos os usuários vinculados a este
+                perfil imediatamente. Usuários com múltiplos perfis terão a união das permissões.
+            </p>
+        </div>
+    </div>
+
+    <!-- Matrix -->
+    <div class="table-container">
+        <div class="rbac-header">
+            <div>
+                <h3 class="cell-bold">Pilar 3 & 4: Matriz de Permissões</h3>
+                <p class="section-header__subtitle">Ações permitidas para cada recurso do sistema.</p>
+            </div>
+            <button class="btn btn--ghost cursor-not-allowed opacity-50 text-xs-md"
+                title="Feature not available in static mode">
+                {% call icons::plus("icon-sm") %}{% endcall %} Novo Recurso
+            </button>
+        </div>
+
+        <div class="table-responsive">
+            <table class="data-table">
+                <thead>
+                    <tr>
+                        <th>Recurso</th>
+                        {% for action in actions %}
+                        <th class="permission-cell permission-header">{{ action.name }}</th>
+                        {% endfor %}
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for res in resources %}
+                    <tr>
+                        <td>
+                            <span class="cell-bold">{{ res.name }}</span>
+                        </td>
+
+                        {% let role_perms = permissions.get(active_role.as_str()).unwrap() %}
+                        {% let res_perms = role_perms.get(res.name.as_str()).unwrap() %}
+
+                        {% for action in actions %}
+                        <td class="permission-cell">
+                            <button
+                                class="permission-box {% if res_perms.actions.contains_key(action.name.as_str()) && res_perms.actions[action.name.as_str()] %}permission-box--granted{% else %}permission-box--denied{% endif %}"
+                                hx-patch="/admin/rbac/toggle?csrf_token={{ csrf_token }}"
+                                hx-vals='{"role": "{{ active_role }}", "resource": "{{ res.name }}", "action": "{{ action.name }}", "current_status": "{% if res_perms.actions.contains_key(action.name.as_str()) && res_perms.actions[action.name.as_str()] %}granted{% else %}denied{% endif %}"}'
+                                hx-target="this" hx-swap="outerHTML">
+                                {% if res_perms.actions.contains_key(action.name.as_str()) &&
+                                res_perms.actions[action.name.as_str()] %}
+                                {% call icons::check("icon-sm") %}{% endcall %}
+                                {% else %}
+                                {% call icons::x("icon-sm") %}{% endcall %}
+                                {% endif %}
+                            </button>
+                        </td>
+                        {% endfor %}
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+</div>

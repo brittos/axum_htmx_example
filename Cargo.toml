@@ -1,0 +1,16 @@
+[package]
+authors = ["Brittos"]
+edition = "2024"
+name = "axum-example-brittos"
+publish = false
+rust-version = "1.92.0"
+version = "0.1.0"
+
+[workspace]
+members = [".", "app", "entity", "migration"]
+
+[dependencies]
+axum-example-app = { path = "app" }
+
+[profile.release]
+debug = true

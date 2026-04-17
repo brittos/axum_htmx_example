@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Bero Admin | {{ title }}</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script src="/static/htmx.min.js"></script>
+    <script src="/static/sse.js"></script>
+    <link rel="stylesheet" href="/static/style.css">
+    {% block head %}{% endblock %}
+    {% import "shared/icons.html" as icons %}
+</head>
+
+<body class="">
+    <!-- Toast Notifications Container (SSE) -->
+    {% include "shared/toaster.html" %}
+
+    <!-- Sidebar Toggle Checkbox (Global State) -->
+    <input type="checkbox" id="sidebar-toggle" class="sidebar-checkbox">
+
+    <div id="app-layout" class="app-container">
+        {% include "admin/dashboard_sidebar.html" %}
+
+        <!-- Main Wrapper -->
+        <div class="main-wrapper">
+            <header class="header">
+                <h1 class="header__title" id="page-title">{{ page_title }}</h1>
+                <div class="header__icons">
+                    <!-- Notifications Bell with Dropdown -->
+                    <div class="header__notification-wrapper">
+                        <!-- O sino se auto-atualiza via hx-trigger="load" para manter estado após navegação -->
+                        <button id="notification-bell-btn" class="header__icon header__icon--notification"
+                            hx-get="/admin/notifications/status" hx-trigger="load" hx-swap="outerHTML">
+                            {% call icons::bell("") %}{% endcall %}
+                        </button>
+                        <div id="notifications-dropdown" class="notifications-dropdown-container"></div>
+                    </div>
+                    {% call icons::search("header__icon") %}{% endcall %}
+                </div>
+            </header>
+
+            <main class="content-area">
+                <div id="main-content" class="content-container">
+                    {% block content %}{% endblock %}
+                </div>
+            </main>
+        </div>
+    </div>
+
+    <!-- Poller para verificar notificações não lidas a cada 30s -->
+    <div hx-get="/admin/notifications/status" hx-trigger="load, every 30s" hx-swap="none"></div>
+
+</body>
+
+</html>

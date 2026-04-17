@@ -1,0 +1,37 @@
+{% import "shared/icons.html" as icons %}
+
+{% let is_users = active_tab.as_str() == "users" %}
+{% let is_rbac = active_tab.as_str() == "rbac" %}
+
+<div class="tabs">
+    <div class="tab-bar">
+        <button type="button" class="tab-btn {% if is_users %}tab-btn--active{% endif %}" hx-get="/admin/users/partial"
+            hx-target="#main-content" hx-swap="innerHTML">
+            {% call icons::users() %}{% endcall %} Usuários
+        </button>
+        <button type="button" class="tab-btn {% if is_rbac %}tab-btn--active{% endif %}" hx-get="/admin/rbac/partial"
+            hx-target="#main-content" hx-swap="innerHTML">
+            {% call icons::shield_check() %}{% endcall %} Pillars 2, 3 & 4: RBAC Matrix
+        </button>
+    </div>
+
+    <div id="user-management-content">
+        {% if is_users %}
+        {% if let Some(users) = users %}
+        {% include "admin/users_partial.html" %}
+        {% endif %}
+        {% else if is_rbac %}
+        {% if let Some(rbac) = rbac %}
+
+
+        {% let active_role = rbac.active_role %}
+        {% let roles = rbac.roles %}
+        {% let resources = rbac.resources %}
+        {% let actions = rbac.actions %}
+        {% let permissions = rbac.permissions %}
+
+        {% include "admin/rbac_partial.html" %}
+        {% endif %}
+        {% endif %}
+    </div>
+</div>

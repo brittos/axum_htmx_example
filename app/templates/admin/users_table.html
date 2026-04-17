@@ -1,0 +1,94 @@
+<div class="table-container" id="users-table-container" hx-get="/admin/users/table" hx-trigger="every 10s"
+    hx-vals='{"page": "{{ page }}"}' hx-swap="outerHTML">
+    <div class="rbac-header">
+        <div>
+            <h2 class="cell-bold">Equipe do Projeto</h2>
+            <p class="section-header__subtitle">Gerenciamento de membros e acessos.</p>
+        </div>
+        {% if can_create %}
+        <button class="btn btn--primary" hx-get="/admin/users/create" hx-target="#user-management-content"
+            hx-swap="outerHTML" hx-select="#user-management-content">Add User</button>
+        {% endif %}
+    </div>
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th>Colaborador</th>
+                    <th>Perfil</th>
+                    <th>Status</th>
+                    {% if can_edit || can_delete %}
+                    <th class="cell-right">Ações</th>
+                    {% endif %}
+                </tr>
+            </thead>
+            <tbody>
+                {% import "shared/icons.html" as icons %}
+                {% for user in users %}
+                <tr>
+                    <td>
+                        <div class="user-row">
+                            <div class="user-row__avatar">{{ user.avatar_initials }}</div>
+                            <div>
+                                <p class="cell-bold">{{ user.name }}</p>
+                                <p class="user-row__email">{{ user.email }}</p>
+                            </div>
+                        </div>
+                    </td>
+                    <td>
+                        <div class="role-badges-list">
+                            {% for role in user.roles %}
+                            <span class="role-badge-mini role-badge-dynamic" style="--role-color: {{ role.color }}">{{
+                                role.name }}</span>
+                            {% endfor %}
+                        </div>
+                    </td>
+                    <td><span
+                            class='badge {% if user.status == "Active" %}badge--success{% else %}badge--secondary{% endif %}'>{{
+                            user.status }}</span></td>
+                    {% if can_edit || can_delete %}
+                    <td class="cell-right">
+                        <div class="action-buttons">
+                            {% if can_edit %}
+                            <button class="btn btn--ghost btn--icon" title="Editar"
+                                hx-get="/admin/users/{{ user.id }}/edit" hx-target="#user-management-content"
+                                hx-swap="outerHTML" hx-select="#user-management-content">
+                                {% call icons::settings("icon-sm") %}{% endcall %}
+                            </button>
+                            {% endif %}
+                            {% if can_delete %}
+                            <button class="btn btn--ghost btn--icon btn--danger" title="Remover"
+                                hx-delete="/admin/users/{{ user.id }}?csrf_token={{ csrf_token }}"
+                                hx-target="closest tr" hx-swap="delete"
+                                hx-confirm="Tem certeza que deseja remover {{ user.name }}?">
+                                {% call icons::x("icon-sm") %}{% endcall %}
+                            </button>
+                            {% endif %}
+                        </div>
+                    </td>
+                    {% endif %}
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if total_pages > 1 %}
+    <div class="pagination">
+        <button class="btn btn--ghost btn--sm pagination-btn" hx-get="/admin/users/table"
+            hx-vals='{"page": "{{ page - 1 }}"}' hx-target="#users-table-container" hx-swap="outerHTML" {% if page <=1
+            %}disabled{% endif %}>
+            ← Anterior
+        </button>
+        <span class="pagination__info">
+            <span>Página {{ page }} de {{ total_pages }}</span>
+        </span>
+        <button class="btn btn--ghost btn--sm pagination-btn" hx-get="/admin/users/table"
+            hx-vals='{"page": "{{ page + 1 }}"}' hx-target="#users-table-container" hx-swap="outerHTML" {% if page>=
+            total_pages %}disabled{% endif %}>
+            Próxima →
+        </button>
+    </div>
+    {% endif %}
+</div>

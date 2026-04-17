@@ -1,0 +1,34 @@
+<div class="notifications-dropdown">
+    <div class="dropdown-backdrop" hx-get="/admin/notifications/close" hx-target="#notifications-dropdown"
+        hx-swap="innerHTML"></div>
+    {% if notifications.is_empty() %}
+    <div class="notifications-dropdown__empty">
+        <span class="notifications-dropdown__icon">🔔</span>
+        <p>Sem notificações</p>
+    </div>
+    {% else %}
+    <div class="notifications-dropdown__header">
+        <span>Notificações ({{ unread_count }})</span>
+        <button class="btn btn--sm btn--ghost" hx-post="/admin/notifications/read-all?csrf_token={{ csrf_token }}"
+            hx-target="#notifications-dropdown" hx-swap="innerHTML">
+            Marcar todas
+        </button>
+    </div>
+    <div class="notifications-dropdown__list">
+        {% for notification in notifications %}
+        <div class="notification-item notification-item--{{ notification.notification_type }} {% if notification.is_read %}notification-item--read{% endif %}"
+            hx-post="/admin/notifications/{{ notification.id }}/read?csrf_token={{ csrf_token }}"
+            hx-target="#notifications-dropdown" hx-swap="innerHTML">
+            <div class="notification-item__content">
+                <strong class="notification-item__title">{{ notification.title }}</strong>
+                <p class="notification-item__message">{{ notification.message }}</p>
+                <span class="notification-item__time">{{ notification.time_ago }}</span>
+            </div>
+            {% if notification.action_url.is_some() %}
+            <a href="{{ notification.action_url.as_ref().unwrap() }}" class="notification-item__action">→</a>
+            {% endif %}
+        </div>
+        {% endfor %}
+    </div>
+    {% endif %}
+</div>

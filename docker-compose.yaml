@@ -1,0 +1,96 @@
+services:
+  database:
+    image: "postgres:latest"
+    container_name: postgresql-database-1
+    ports:
+      - 5432:5432
+    environment:
+      POSTGRES_USER: root # The PostgreSQL user (useful to connect to the database)
+      POSTGRES_PASSWORD: root # The PostgreSQL password (useful to connect to the database)
+      POSTGRES_DB: axum_example # The PostgreSQL default database (automatically created at first launch)
+    volumes:
+      - pg_data:/var/lib/postgresql
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U root"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  redis:
+    image: "redis:latest"
+    container_name: redis-cache-1
+    ports:
+      - 6379:6379
+    command: redis-server --appendonly yes
+    volumes:
+      - redis_data:/data
+    healthcheck:
+      test: ["CMD", "redis-cli", "ping"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+  pgadmin:
+    image: "dpage/pgadmin4:latest"
+    container_name: pgadmin4-1
+    ports:
+      - 5050:80
+    environment:
+      PGADMIN_DEFAULT_EMAIL: admin@admin.com
+      PGADMIN_DEFAULT_PASSWORD: admin123
+      PGADMIN_CONFIG_SERVER_MODE: "False"
+      PGADMIN_CONFIG_MASTER_PASSWORD_REQUIRED: "False"
+    volumes:
+      - pgadmin_data:/var/lib/pgadmin
+    depends_on:
+      database:
+        condition: service_healthy
+
+  minio:
+    image: "minio/minio:latest"
+    container_name: minio-1
+    ports:
+      - 9000:9000
+      - 9001:9001
+    environment:
+      MINIO_ROOT_USER: minioadmin
+      MINIO_ROOT_PASSWORD: minioadmin
+      MINIO_DEFAULT_BUCKETS: axumkit
+    command: server /data --console-address ":9001"
+    volumes:
+      - minio_data:/data
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:9000/minio/health/live"]
+      interval: 30s
+      timeout: 20s
+      retries: 3
+
+  axum:
+    image: "registry.suse.com/bci/bci-base:16.0"
+    container_name: axum-1
+    #network_mode: "host"
+    ports:
+      - 8000:8000
+    env_file:
+      - .env.local
+    # Privileged mode is required for perf to access kernel counters
+    #privileged: true
+    volumes:
+      # Mount the project root to target/release
+      - ./target/release:/app
+      # Mount static files for CSS/JS
+      #- ./app/static:/app/app/static
+    command: /app/axum-example-brittos
+    working_dir: /app
+    depends_on:
+      database:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+
+volumes:
+  pg_data:
+  redis_data:
+  pgadmin_data:
+  minio_data:

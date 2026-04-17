@@ -1,0 +1,66 @@
+{% extends "admin/base.html" %}
+{% import "shared/icons.html" as icons %}
+
+{% block content %}
+<div id="post-edit-container">
+    <div class="modern-form-card animate-fade">
+        <div class="modern-form-header">
+            <div>
+                <h2 class="cell-bold text-gradient">Editar Post</h2>
+                <p class="section-header__subtitle">Atualize os dados da publicação.</p>
+            </div>
+            <button class="btn btn--ghost btn--sm" hx-get="/admin/posts" hx-target="#main-content" hx-swap="innerHTML"
+                hx-push-url="true">
+                {% call icons::chevron_left() %}{% endcall %} Voltar
+            </button>
+        </div>
+
+        <form hx-put="/admin/posts/{{ post.id }}?csrf_token={{ csrf_token }}" hx-target="#main-content"
+            hx-push-url="/admin/posts" class="flex-column gap-6">
+            <div class="modern-form-grid">
+                <div class="form-field">
+                    <label for="title">Título</label>
+                    <input type="text" id="title" name="title" class="form-input" required value="{{ post.title }}">
+                </div>
+
+                <div class="form-field">
+                    <label for="author">Autor</label>
+                    <input type="text" id="author" name="author" class="form-input" required value="{{ post.author }}">
+                </div>
+
+                <div class="form-field">
+                    <label for="category">Categoria</label>
+                    <input type="text" id="category" name="category" class="form-input" required
+                        value="{{ post.category }}">
+                </div>
+
+                <div class="form-field">
+                    <label for="status">Status</label>
+                    <select id="status" name="status" class="form-select">
+                        <option value="Rascunho" {% if post.status=="Rascunho" %}selected{% endif %}>Rascunho</option>
+                        <option value="Publicado" {% if post.status=="Publicado" %}selected{% endif %}>Publicado
+                        </option>
+                    </select>
+                </div>
+
+                <div class="form-field">
+                    <label for="image_url">URL da Imagem</label>
+                    <input type="text" id="image_url" name="image_url" class="form-input" value="{{ post.image_url }}">
+                </div>
+
+                <div class="form-field form-field--full">
+                    <label for="text">Conteúdo</label>
+                    <textarea id="text" name="text" class="form-input form-textarea" rows="8"
+                        required>{{ post.text }}</textarea>
+                </div>
+            </div>
+
+            <div class="form-footer">
+                <button type="submit" class="btn btn--primary">
+                    {% call icons::check("icon-sm") %}{% endcall %} Salvar Alterações
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+{% endblock %}

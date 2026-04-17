@@ -1,0 +1,10 @@
+{% import "shared/icons.html" as icons %}
+<button class="permission-box permission-box--{{ status }}" hx-patch="/admin/rbac/toggle?csrf_token={{ csrf_token }}"
+    hx-vals='{"role": "{{ role }}", "resource": "{{ resource }}", "action": "{{ action }}", "current_status": "{{ status }}"}'
+    hx-target="this" hx-swap="outerHTML">
+    {% if is_granted %}
+    {% call icons::check("icon-sm") %}{% endcall %}
+    {% else %}
+    {% call icons::x("icon-sm") %}{% endcall %}
+    {% endif %}
+</button>

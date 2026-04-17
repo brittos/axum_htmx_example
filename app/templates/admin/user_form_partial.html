@@ -1,0 +1,71 @@
+{% import "shared/icons.html" as icons %}
+<div id="user-management-content">
+    <div class="modern-form-card animate-fade">
+        <div class="modern-form-header">
+            <div>
+                <h2 class="cell-bold text-gradient">Novo Usuário</h2>
+                <p class="section-header__subtitle">Defina as credenciais e o perfil de acesso do novo membro.</p>
+            </div>
+            <button class="btn btn--ghost btn--sm" hx-get="/admin/users/partial" hx-target="#user-management-content"
+                hx-swap="outerHTML" hx-select="#user-management-content">
+                {% call icons::chevron_left() %}{% endcall %} Voltar
+            </button>
+        </div>
+
+        <form hx-post="/admin/users?csrf_token={{ csrf_token }}" hx-target="#user-management-content"
+            hx-swap="outerHTML" hx-select="#user-management-content" class="flex-column gap-6">
+            <div class="modern-form-grid">
+                <div class="form-field">
+                    <label for="name">Nome Completo</label>
+                    <input type="text" id="name" name="name" class="form-input" required
+                        placeholder="Ex: João da Silva">
+                </div>
+
+                <div class="form-field">
+                    <label for="user">Username</label>
+                    <input type="text" id="user" name="user" class="form-input" required placeholder="Ex: joao.silva">
+                </div>
+
+                <div class="form-field">
+                    <label for="email">E-mail Corporativo</label>
+                    <input type="email" id="email" name="email" class="form-input" required
+                        placeholder="joao@empresa.com">
+                </div>
+
+                <div class="form-field">
+                    <label for="password">Senha Temporária</label>
+                    <input type="password" id="password" name="password" class="form-input" required
+                        placeholder="••••••••">
+                </div>
+
+                <div class="form-field">
+                    <label>Perfis (Roles)</label>
+                    <div class="role-badge-container" id="role-badges">
+                        {% for role in roles %}
+                        <label class="role-badge-mini role-badge-interactive" style="--role-color: {{ role.color }}">
+                            <input type="checkbox" name="role_ids" class="role-checkbox" value="{{ role.id }}" hidden>
+                            <span class="role-badge__name">{{ role.name }}</span>
+                            <span class="role-badge__check">{% call icons::check("icon-xs") %}{% endcall %}</span>
+                        </label>
+                        {% endfor %}
+                    </div>
+                    <small class="text-secondary">Clique para selecionar múltiplos perfis</small>
+                </div>
+
+                <div class="form-field">
+                    <label for="status">Status da Conta</label>
+                    <select id="status" name="status" class="form-select">
+                        <option value="Active" selected>Ativo</option>
+                        <option value="Inactive">Inativo</option>
+                    </select>
+                </div>
+            </div>
+
+            <div class="form-footer">
+                <button type="submit" class="btn btn--primary">
+                    {% call icons::plus("icon-sm") %}{% endcall %} Criar Usuário
+                </button>
+            </div>
+        </form>
+    </div>
+</div>

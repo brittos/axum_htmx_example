@@ -1,0 +1,75 @@
+{% import "shared/icons.html" as icons %}
+
+{% let is_dashboard = active_tab == "dashboard" %}
+{% let is_users = active_tab == "users" %}
+{% let is_posts = active_tab == "posts" %}
+{% let is_settings = active_tab == "settings" %}
+{% let is_audit = active_tab == "audit" %}
+
+<!-- Sidebar -->
+<aside class="sidebar">
+    <!-- Botão de Toggle (Label para o Checkbox - Global) -->
+    <label for="sidebar-toggle" class="sidebar__toggle-btn" title="Alternar Sidebar">
+        {% call icons::chevron_left("toggle-icon", "toggle-icon") %}{% endcall %}
+    </label>
+
+    <div class="sidebar__header">
+        <div class="sidebar__brand">
+            {% call icons::layout_grid("logo-icon") %}{% endcall %}
+            <span class="sidebar__title">Bero Admin</span>
+        </div>
+    </div>
+
+    <nav class="sidebar__nav">
+        {% if sidebar_user.can_read("Dashboard") %}
+        <button type="button" class="nav-item {% if is_dashboard %}nav-item--active{% endif %}" hx-get="/admin"
+            hx-target="#app-layout" hx-swap="outerHTML" hx-select="#app-layout" hx-push-url="true">
+            {% call icons::home() %}{% endcall %}
+            <span>Dashboard</span>
+        </button>
+        {% endif %}
+        {% if sidebar_user.can_read("User Management") %}
+        <button type="button" class="nav-item {% if is_users %}nav-item--active{% endif %}"
+            hx-get="/admin/users/management" hx-target="#app-layout" hx-swap="outerHTML" hx-select="#app-layout"
+            hx-push-url="true">
+            {% call icons::users() %}{% endcall %}
+            <span>User Management</span>
+        </button>
+        {% endif %}
+        {% if sidebar_user.can_read("Posts") %}
+        <button type="button" class="nav-item {% if is_posts %}nav-item--active{% endif %}" hx-get="/admin/posts"
+            hx-target="#app-layout" hx-swap="outerHTML" hx-select="#app-layout" hx-push-url="true">
+            {% call icons::file_text() %}{% endcall %}
+            <span>Posts</span>
+        </button>
+        {% endif %}
+        {% if sidebar_user.can_read("Audit Logs") %}
+        <button type="button" class="nav-item {% if is_audit %}nav-item--active{% endif %}" hx-get="/admin/audit-logs"
+            hx-target="#app-layout" hx-swap="outerHTML" hx-select="#app-layout" hx-push-url="true">
+            {% call icons::clipboard_list() %}{% endcall %}
+            <span>Audit Logs</span>
+        </button>
+        {% endif %}
+        {% if sidebar_user.can_read("Settings") %}
+        <button type="button" class="nav-item {% if is_settings %}nav-item--active{% endif %}" hx-get="/admin/settings"
+            hx-target="#app-layout" hx-swap="outerHTML" hx-select="#app-layout" hx-push-url="true">
+            {% call icons::settings() %}{% endcall %}
+            <span>Settings</span>
+        </button>
+        {% endif %}
+    </nav>
+
+    <div class="sidebar__footer">
+        <div class="user-profile" hx-get="/admin/profile" hx-target="#main-content" hx-push-url="true"
+            style="cursor: pointer;">
+            <div class="user-profile__avatar">{{ sidebar_user.initials }}</div>
+            <div class="user-profile__info">
+                <p class="user-profile__name">{{ sidebar_user.name }}</p>
+                <p class="user-profile__role">{{ sidebar_user.role }}</p>
+            </div>
+        </div>
+        <a href="/admin/logout" class="logout-btn" title="Sair">
+            {% call icons::log_out("icon-sm") %}{% endcall %}
+        </a>
+    </div>
+</aside>

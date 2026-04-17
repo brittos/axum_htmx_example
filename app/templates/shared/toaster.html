@@ -1,0 +1,5 @@
+{# Container SSE para toasts - incluir uma vez no dashboard #}
+
+<div id="toast-container" class="toast-container" hx-ext="sse" sse-connect="/admin/toasts/stream" sse-swap="toast"
+    hx-swap="afterbegin">
+</div>

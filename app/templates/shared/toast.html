@@ -1,0 +1,18 @@
+{# Toast individual - renderizado pelo handler SSE #}
+{% import "shared/icons.html" as icons %}
+
+<div class="toast toast--{{ level }} toast--auto-dismiss" hx-trigger="load delay:4s" hx-delete="/admin/toasts/dismiss"
+    hx-swap="delete">
+    <span class="toast__icon">
+        {% if level == "success" %}
+        {{ icons::check_circle(class="") }}
+        {% else if level == "error" %}
+        {{ icons::x_circle(class="") }}
+        {% else if level == "warning" %}
+        {{ icons::alert_circle(class="") }}
+        {% else %}
+        {{ icons::info(class="") }}
+        {% endif %}
+    </span>
+    <span class="toast__message">{{ message }}</span>
+</div>

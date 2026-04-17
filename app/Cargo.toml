@@ -1,0 +1,62 @@
+[package]
+authors = ["Brittos"]
+edition = "2024"
+name = "axum-example-app"
+publish = false
+rust-version = "1.92.0"
+version = "0.1.0"
+
+[dependencies]
+anyhow = "1.0.75"
+
+axum = "0.8"
+dotenvy = "0.15.7"
+entity = { path = "../entity" }
+migration = { path = "../migration" }
+serde = "1.0.193"
+serde_urlencoded = "0.7"
+serde_json = "1.0.108"
+askama = "0.15"
+tokio = { version = "1.34.0", features = ["full"] }
+tower = "0.5"
+tower-cookies = "0.11"
+tower-http = { version = "0.6", features = [
+    "fs",
+    "trace",
+    "compression-gzip",
+    "timeout",
+    "set-header",
+] }
+validator = { version = "0.20.0", features = ["derive"] }
+tracing = "0.1.43"
+tracing-subscriber = { version = "0.3.18", features = ["env-filter"] }
+tracing-appender = "0.2.4"
+uuid = { version = "1.19.0", features = ["v7", "serde"] }
+chrono = { version = "0.4.42", features = ["serde"] }
+once_cell = "1.19"
+regex = "1.10"
+argon2 = "0.5.3"
+tower_governor = "0.8.0"
+governor = "0.10.4"
+ammonia = "4.0"
+redis = { version = "1.0.2", features = ["tokio-comp", "connection-manager"] }
+tokio-stream = { version = "0.1", features = ["sync"] }
+futures = "0.3"
+rust-embed = "8"
+axum-embed = "0.1"
+
+
+[dependencies.sea-orm]
+features = [
+    "debug-print",
+    "runtime-tokio-native-tls",
+    "sqlx-postgres",
+    "sqlx-sqlite",
+]
+version = "~2.0.0-rc.20"
+
+[dev-dependencies]
+axum-example-app = { path = ".", features = ["sqlite"] }
+axum-test = "18.4.1"
+[features]
+sqlite = ["sea-orm/sqlx-sqlite"]

@@ -1,0 +1,103 @@
+{% import "shared/icons.html" as icons %}
+<div class="table-container" id="posts-container">
+    <div class="rbac-header">
+        <div>
+            <h2 class="cell-bold">Biblioteca de Conteúdo</h2>
+            <p class="section-header__subtitle">Gerencie suas publicações e ativos digitais.</p>
+        </div>
+        <div class="section-header__actions">
+            <button class="btn btn--ghost" title="Filtrar">
+                {% call icons::filter() %}{% endcall %}
+            </button>
+            <button class="btn btn--ghost" title="Download">
+                {% call icons::download() %}{% endcall %}
+            </button>
+            <button class="btn btn--primary" hx-get="/admin/posts/create" hx-target="#app-layout" hx-swap="outerHTML"
+                hx-select="#app-layout" hx-push-url="true">
+                {% call icons::plus() %}{% endcall %}
+                Novo Post
+            </button>
+        </div>
+    </div>
+
+    <div class="table-responsive">
+        <table class="data-table">
+            <thead>
+                <tr>
+                    <th># ID</th>
+                    <th>Capa</th>
+                    <th>Título</th>
+                    <th>Autor</th>
+                    <th>Categoria</th>
+                    <th>Status</th>
+                    <th>Data</th>
+                    <th>Views</th>
+                    <th>Coment.</th>
+                    <th class="cell-right">Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for post in posts %}
+                <tr>
+                    <td class="cell-mono">{{ post.id }}</td>
+                    <td><img src="{{ post.image_url }}" class="cell-thumbnail" alt=""></td>
+                    <td class="cell-bold cell-truncate">{{ post.title }}</td>
+                    <td class="cell-secondary">{{ post.author }}</td>
+                    <td><span class="cell-badge-small">{{ post.category }}</span></td>
+                    <td>
+                        <span class="badge {% if post.status == " Publicado" %}badge--success{% else
+                            %}badge--secondary{% endif %}">
+                            {{ post.status }}
+                        </span>
+                    </td>
+                    <td class="cell-date">{{ post.date }}</td>
+                    <td>
+                        <div class="cell-flex">
+                            {% call icons::eye() %}{% endcall %}
+                            {{ post.views }}
+                        </div>
+                    </td>
+                    <td>
+                        <div class="cell-flex">
+                            {% call icons::message_square() %}{% endcall %}
+                            {{ post.comments }}
+                        </div>
+                    </td>
+                    <td class="cell-right">
+                        <div class="action-buttons">
+                            <button class="btn btn--ghost btn--icon" title="Editar"
+                                hx-get="/admin/posts/{{ post.id }}/edit" hx-target="#app-layout" hx-swap="outerHTML"
+                                hx-select="#app-layout" hx-push-url="true">
+                                {% call icons::settings("icon-sm") %}{% endcall %}
+                            </button>
+                            <button class="btn btn--ghost btn--icon btn--danger" title="Remover"
+                                hx-delete="/admin/posts/{{ post.id }}?csrf_token={{ csrf_token }}"
+                                hx-target="closest tr" hx-swap="delete"
+                                hx-confirm="Tem certeza que deseja remover este post?">
+                                {% call icons::x("icon-sm") %}{% endcall %}
+                            </button>
+                        </div>
+                    </td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+
+    <!-- Pagination -->
+    {% if total_pages > 1 %}
+    <div class="pagination">
+        <button class="btn btn--ghost btn--sm" hx-get="/admin/posts?page={{ page - 1 }}" hx-target="#posts-container"
+            hx-swap="outerHTML" {% if page <=1 %}disabled{% endif %}>
+            ← Anterior
+        </button>
+        <span class="pagination__info">
+            <span>Página {{ page }} de {{ total_pages }}</span>
+        </span>
+        <button class="btn btn--ghost btn--sm" hx-get="/admin/posts?page={{ page + 1 }}" hx-target="#posts-container"
+            hx-swap="outerHTML" {% if page>= total_pages %}disabled{% endif %}>
+            Próxima →
+        </button>
+    </div>
+    {% endif %}
+</div>
